@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="JS-library.js"></script>
+<script>
+    var xDir = "right";		// could be "right" or "left"
+    var yDir = "down";		// could be "down" or "up"
+    var ballSpeed = 40
+
+function move() {
+    if (timerNum==-1) {
+        return;
+    }
+    
+    var x = getStyle ("button", "left");        // get the current left position of button in px
+    x = parseInt(x);                            // convert to a number
+    if (xDir == "right") {
+	    x = x + 5;
+    }
+    else {
+	    x = x - 5;
+    }
+    
+    var y = getStyle ("button", "top");
+    y = parseInt(y);
+    if (yDir == "down") {
+        y = y + 5;
+    }
+    else {
+        y = y - 5;
+    }
+    
+    var bw = getStyle("button", "width");
+    bw = parseInt(bw);
+    var fw = getStyle("frame", "width");
+    fw = parseInt(fw);
+    if (x<=0) {
+        setStyle("button", "left", "0px");
+        xDir = "right";
+    } // set the left position of button to new value in pixels
+    else if (x>=fw-bw){
+        setStyle("button", "left", (fw-bw) + "px");    
+        xDir = "left";
+    }
+    else {
+        setStyle ("button", "left", x + "px");
+    }
+
+    
+    var bh = getStyle("button", "height");
+    bh = parseInt(bh);
+    var fh = getStyle("frame", "height");
+    fh = parseInt(fh);
+    if (y<=0) {
+        setStyle("button", "top", "0px");
+        yDir = "down";
+    }
+    else if (y>=fh-bh){
+        setStyle("button", "top", (fh-bh) + "px");    
+        yDir = "up";
+     }
+    else {
+        setStyle ("button", "top", y + "px");
+    }
+}
+
+var timerNum = -1;
+
+function startMove() {
+    if (timerNum==-1){
+        timerNum = setInterval("move()", ballSpeed);
+        timerNum2 = setInterval("countDown()", 1000);
+    }
+}
+
+var timerNum2 = -1;
+
+function stopMove(){
+    if (timerNum != -1){
+        clearInterval(timerNum);
+        clearInterval(timerNum2);
+        timerNum=-1;
+        timerNum2=-1;
+    }
+}
+
+function resetGame() {
+    // var x = getStyle("button", "left");
+    // x = parseInt(x);
+    setStyle("button", "left", 5+"px");
+    
+    // var y = getStyle("button", "top");
+    // y = parseInt(y);
+    setStyle("button", "top", 5+"px");
+    
+    stopMove();
+    
+    var c = getText("remainingTime");
+    c = parseInt(c);
+    setText("remainingTime", 30);
+}
+
+function countPoint () {
+            var c = getText("score");
+            c = parseInt(c);
+
+            
+            if (timerNum == -1) {
+                c = c;
+                setText("score", c);
+                alert("YOU ARE CHEATING!");
+            }
+            else {
+                c = c+1;
+                setText("score", c);
+                playScoreAudio();
+                ballSpeed = ballSpeed - 1;
+                clearInterval(timerNum);
+                timerNum = setInterval("move()", ballSpeed);
+            }
+}
+
+function clearCount() {
+    var c = getText("score");
+    setText("score", 0);
+}
+    
+function countDown() {
+    var x = getText("remainingTime");
+            x = parseInt(x);
+            x=x-1;
+            
+            if (x==0) {
+                setText("remainingTime", x);
+                clearInterval (timerNum2);
+                stopMove();
+                alert("Your time has run out! Click RESET.");
+            }
+            else {
+                setText("remainingTime", x);
+            }
+}
+
+</script>
+<title>Clickball</title>
+<style>
+@import url('https://fonts.googleapis.com/css?family=Quicksand');
+body {
+    background-image: url(http://www.barangroup.co/tr/tekno_dosyalar/large/26_02_16_58329_cbaad0e225438f72885e6784cf9fdb94.jpg);
+    background-size: 100% auto;
+    font-size: 20px;
+    font-family: Quicksand;
+    color: white;
+}
+
+h1 {
+    text-align: center;
+    font-family: Quicksand;
+}
+
+span{
+    font-size: 20px;
+}
+
+img#button {
+    position: absolute;
+    /*thing moving inside of another thing has a position of absolute*/
+    top: 10px;
+    left: 10px;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+}
+
+div#frame {
+    border: 1px solid gray;
+    background-color: rgba(288,288,288,0.43);
+    position: relative;
+    height: 400px;
+    width: 600px;
+    margin: auto;
+    margin-top: 15px;
+}
+
+button#click {
+    position: fixed;
+    top: 500px;
+    left: 200px;
+}
+
+img#start {
+    position: fixed;
+    top: 600px;
+    left: 550px;
+    width: 75px;
+    height: 75px;
+    cursor: pointer;
+}
+
+img#stop {
+    position: fixed;
+    top: 600px;
+    left: 650px;
+    width: 75px;
+    height: 75px;
+    cursor: pointer;
+}
+
+img#reset {
+    position: fixed;
+    top: 600px;
+    left: 750px;
+    width: 75px;
+    height: 75px;
+    cursor: pointer;
+}
+</style>
+<script src='JS-library.js'></script>
+</head>
+<body>
+    <!--<audio autoplay controls>-->
+    <!--    <source src="stitchesmusic.mp3"> https://www.youtube.com/watch?v=Bkg08NvtvBU -->
+    <!--</audio>-->
+    
+    
+    <audio id="scoreaudio">
+        <source src="clickball.mp3">
+    </audio>
+
+<script>
+var audio = document.getElementById("scoreaudio");
+function playScoreAudio() {
+    audio.play();
+}
+</script>
+<h1>ClickPlanet</h1>
+SCORE: <span id="score">0</span><br><br>
+TIME REMAINING: <span id="remainingTime">30</span> seconds
+
+
+<div id="frame">
+<img src="http://space-facts.com/wp-content/uploads/neptune.png" alt="Neptune" id="button" onmousedown="move(); countPoint();">
+<div id="box">
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Start_button_green_arrow.svg/2000px-Start_button_green_arrow.svg.png" alt="Green Play Button" id="start" onclick="startMove();">
+<img src="http://publicdomainvectors.org/photos/akiross_Audio_Button_Set_2.png" alt="Red Stop Button" id="stop" onclick="stopMove();">
+<img src="http://www.nbrepayment.gov.bd/images/refresh.png" alt="Blue Reset Button" id="reset" onclick="resetGame(); clearCount();">
+</div>
+</div>
+<p style="position: fixed; top: 400px; left: 50px;">Turn up your volume!</p>
+</body>
+</html>
